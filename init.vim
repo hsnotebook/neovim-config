@@ -197,15 +197,11 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'aklt/plantuml-syntax'
 let g:plantuml_executable_script="java -jar /home/hs/bin/plantuml.jar -charset UTF-8"
 
-Plug 'vimwiki/vimwiki'
-let g:vimwiki_conceallevel=0
-if (has("win32"))
-	let g:vimwiki_list = [{'path': '~/vimwiki/',
-				\ 'syntax': 'markdown', 'ext': '.md'}]
-else
-	let g:vimwiki_list = [{'path': 'e:/documents/vimwiki',
-				\ 'syntax': 'markdown', 'ext': '.md'}]
-endif
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_emphasis_multiline = 0
+let g:vim_markdown_fenced_languages = ['viml=vim', 'bash=sh', 'xml=xml', "java=java", "json=json"]
 
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 let g:deoplete#enable_at_startup = 1
