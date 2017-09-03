@@ -43,6 +43,11 @@ colorscheme desert
 " set colorcolumn=80
 " highlight ColorColumn ctermbg=gray ctermfg=black guibg=grey guifg=black
 
+" neovim-qt supports <s-insert> to paste from OS clipboard.
+if (has("win32"))
+	inoremap <s-insert> <c-r>+
+endif
+
 set showmatch
 set mat=2
 
