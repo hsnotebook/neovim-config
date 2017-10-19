@@ -37,22 +37,10 @@ nnoremap <leader>q :q<cr>
 nnoremap <leader>wq :wq<cr>
 nnoremap <leader>m :on<cr>
 
-colorscheme desert
-
-" set textwidth=80
-" set colorcolumn=80
-" highlight ColorColumn ctermbg=gray ctermfg=black guibg=grey guifg=black
-
-" neovim-qt supports <s-insert> to paste from OS clipboard.
-if (has("win32"))
-	inoremap <s-insert> <c-r>+
-endif
+colorscheme wombat
 
 set showmatch
 set mat=2
-
-set number
-set relativenumber
 
 set showcmd
 
@@ -121,41 +109,19 @@ vnoremap <silent> # :<C-U>
     \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
     \gV:call setreg('"', old_reg, old_regtype)<CR>
 
-if executable('ag')
-  " Use Ag over Grep
-  set grepprg=ag\ --nogroup\ --nocolor
-
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
-
-  " " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 1
-
-  if !exists(":Ag")
-    command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-    nnoremap \ :Ag<SPACE>
-  endif
-
-  " bind K to grep word under cursor
-  nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
-endif
-
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 nnoremap <leader>fe :NERDTreeToggle<cr>
 nnoremap <leader>ff :NERDTreeFind<cr>
 
-Plug 'ctrlpvim/ctrlp.vim'
-let g:ctrlp_regexp = 1
-let g:ctrlp_working_path_mode = 'ra'
-
-let g:ctrlp_custom_ignore = {
-	\ 'dir':  '\.git$\|\.svn$\|target$\|bin$\|bin-debug$\|node_modules$',
-	\ 'file': '\.png$\|\.so$\|\.dll$)$'
-	\ }
-let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:10,results:0'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
+Plug 'junegunn/fzf.vim'
+nnoremap <c-p><c-f> :Files<cr>
+nnoremap <c-p><c-b> :Buffers<cr>
+nnoremap <c-p><c-u> :Snippets<cr>
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-l> <plug>(fzf-complete-line)
 
 Plug 'SirVer/ultisnips'
-let g:UltiSnipsSnippetDirectories=[nvim_home . "/UltiSnips"]
 let g:UltiSnipsEditSplit="vertical"
 
 Plug 'tpope/vim-fugitive'
@@ -197,11 +163,50 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'aklt/plantuml-syntax'
 let g:plantuml_executable_script="java -jar /home/hs/bin/plantuml.jar -charset UTF-8"
 
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
-let g:vim_markdown_folding_disabled = 1
-let g:vim_markdown_emphasis_multiline = 0
-let g:vim_markdown_fenced_languages = ['viml=vim', 'bash=sh', 'xml=xml', "java=java", "json=json"]
+Plug 'vimwiki/vimwiki'
+let wiki = {}
+let wiki.path = '~/vimwiki/'
+let wiki.nested_syntaxes = {
+			\ 'python': 'python',
+			\ 'vimL': 'vim',
+			\ 'bash': 'bash',
+			\ 'java': 'java',
+			\ 'xml': 'xml',
+			\ 'perl': 'perl'}
+let g:vimwiki_list = [wiki]
+let g:vimwiki_html_header_numbering = 1
+au Filetype vimwiki setlocal textwidth=80
+
+" file:xxx::lineNum to unnamed register
+function! VimwikiStoreLink()
+	let @" = 'file:'.expand("%:p").'::'.line('.')
+endfunction
+command! StoreLink :call VimwikiStoreLink()
+
+function! VimwikiLinkHandler(link)
+	try
+		let pageNum = matchstr(a:link, '::\zs\d\+')
+		let file = matchstr(a:link, '^.*:\zs.*\ze::')
+		let fileCmdOutput = system('file '.file)
+		if pageNum ==? ""
+			pageNum = 1
+		endif
+		if matchstr(fileCmdOutput, '\zsPDF\ze') ==? 'PDF'
+			let opener = '/usr/bin/zathura'
+			call system(opener.' -P '.pageNum.' '.file.' &')
+			return 1
+		elseif matchstr(fileCmdOutput, '\zstext\ze') ==? 'text'
+			execute 'edit +'.pageNum.' '.file
+			return 1
+		else
+			return 0
+		endif
+	catch
+		echom "This can happen for a variety of reasons ..."
+	endtry
+	return 0
+endfunction
+
 
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 let g:deoplete#enable_at_startup = 1
