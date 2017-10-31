@@ -113,13 +113,9 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 nnoremap <leader>fe :NERDTreeToggle<cr>
 nnoremap <leader>ff :NERDTreeFind<cr>
 
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
-Plug 'junegunn/fzf.vim'
-nnoremap <c-p><c-f> :Files<cr>
-nnoremap <c-p><c-b> :Buffers<cr>
-nnoremap <c-p><c-u> :Snippets<cr>
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-l> <plug>(fzf-complete-line)
+Plug 'kien/ctrlp.vim'
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/target/*
+let g:ctrlp_clear_cache_on_exit = 0
 
 Plug 'SirVer/ultisnips'
 let g:UltiSnipsEditSplit="vertical"
