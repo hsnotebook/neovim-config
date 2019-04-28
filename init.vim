@@ -7,22 +7,23 @@ endif
 call plug#begin(nvim_home . '/plugged')
 
 let mapleader=" "
+let maplocalleader=" "
 
 filetype plugin indent on
 
-""""""""""" windows and tabs start """"""""""""""""""""
-" move focus on windows and tabs
+" Windows and tabs start {{{
+
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 nnoremap tn :tabn<cr>
 nnoremap tp :tabp<cr>
-
 Plug 'gcmt/taboo.vim'
-""""""""""" windows and tabs end """"""""""""""""""""
 
-""""""""""" terminal Configuration start """"""""""""
+" }}}
+
+" Terminal {{{
 tnoremap <C-h> <C-\><C-N><C-w>h
 tnoremap <C-j> <C-\><C-N><C-w>j
 tnoremap <C-k> <C-\><C-N><C-w>k
@@ -34,28 +35,16 @@ augroup term_statusline
 augroup END
 nnoremap <leader>tb :vsplit term://bash<cr>
 tnoremap <leader>tb <C-\><C-N>:vsplit term://bash<cr>
-""""""""""" terminal Configuration end """"""""""""
+" }}}
 
-
-""""""""""" save and quit start """"""""""""
+" Misc {{{
 nnoremap <leader>w :w<cr>
 nnoremap <leader>q :q<cr>
 nnoremap <leader>wq :wq<cr>
-""""""""""" save and quit end """"""""""""
-
 nnoremap <leader>m :on<cr>
-
-colorscheme wombat
-
-set showmatch
-set mat=2
-
-set showcmd
 
 nnoremap <leader>ev :sp $MYVIMRC<CR>
 nnoremap <leader>sv :source $MYVIMRC<CR>
-
-set splitright
 
 " disable arrow in insert mode
 inoremap <left> <nop>
@@ -63,7 +52,21 @@ inoremap <right> <nop>
 inoremap <up> <nop>
 inoremap <down> <nop>
 
-" normal tab setting
+colorscheme wombat
+
+set showmatch
+set mat=2
+
+set showcmd
+set splitright
+set autowrite
+set autoread
+
+set laststatus=2
+set statusline=%F%m%r%w\ %{fugitive#statusline()}\ [POS+%04l,%04v]\ [%p%%]\ [LEN=%L]\ [%{&ff}]
+" }}}
+
+" Tab config {{{
 set tabstop=4
 set shiftwidth=4
 set noexpandtab
@@ -71,8 +74,9 @@ augroup xml_html_indent
 	au!
 	autocmd FileType xml,html setlocal tabstop=2 | setlocal shiftwidth=2
 augroup END
+" }}}
 
-""""""""""" search config start """""""""""
+" Search {{{
 set incsearch
 set hlsearch
 set ignorecase
@@ -94,17 +98,9 @@ vnoremap <silent> # :<C-U>
 
 " disables search highlighting when you are done searching and re-enables it when you search again.
 Plug 'romainl/vim-cool'
-""""""""""" search config end """""""""""
+" }}}
 
-set autowrite
-set autoread
-
-set laststatus=2
-set statusline=%F%m%r%w\ %{fugitive#statusline()}\ [POS+%04l,%04v]\ [%p%%]\ [LEN=%L]\ [%{&ff}]
-
-inoremap <c-u> <esc>viwUea
-
-" delete trailing whitespace when save buffer. {{{
+" Delete trailing whitespace {{{
 function! DeleteTrailingWS()
 	execute 'normal! mz'
 	execute '%s/\s\+$//e'
@@ -130,10 +126,6 @@ let g:deoplete#complete_method = 'omnifunc'
 " quickfix
 Plug 'romainl/vim-qf'
 
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-nnoremap <leader>fe :NERDTreeToggle<cr>
-nnoremap <leader>ff :NERDTreeFind<cr>
-
 Plug 'kien/ctrlp.vim'
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/target/*,*/node_modules/*
 let g:ctrlp_clear_cache_on_exit = 0
@@ -152,9 +144,7 @@ Plug 'tpope/vim-surround'
 
 Plug 'tpope/vim-repeat'
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""frontend develop"""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Frontend Develop {{{
 Plug 'posva/vim-vue'
 augroup web_indent
     au!
@@ -171,11 +161,10 @@ let g:tern_request_timeout = 1
 let g:tern_show_signature_in_pum = 0
 
 Plug 'pangloss/vim-javascript'
-
 " javascript
 Plug 'prettier/vim-prettier', { 'do': 'npm install -g' }
+" }}}
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Plug 'christoomey/vim-tmux-navigator'
 
@@ -207,52 +196,79 @@ augroup plantuml_refresh
 	au filetype plantuml inoremap <f5> <esc>:w<cr>:silent make<cr>
 augroup END
 
-Plug 'vimwiki/vimwiki'
-let wiki = {}
-let wiki.path = '~/vimwiki/'
-let wiki.auto_toc=1
-let wiki.nested_syntaxes = {
-			\ 'python': 'python',
-			\ 'vimL': 'vim',
-			\ 'bash': 'bash',
-			\ 'java': 'java',
-			\ 'json': 'json',
-			\ 'xml': 'xml',
-			\ 'plantuml': 'plantuml',
-			\ 'perl': 'perl'}
-let g:vimwiki_list = [wiki]
-let g:vimwiki_html_header_numbering = 1
-au Filetype vimwiki setlocal textwidth=80
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""" Edit something """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" " tabular plugin is used to format tables
+" Plug 'godlygeek/tabular'
+" " JSON front matter highlight plugin
+" Plug 'elzr/vim-json'
+" Plug 'plasticboy/vim-markdown'
 
-" file:xxx::lineNum to unnamed register
-function! VimwikiStoreLink()
-	let @" = 'file:'.expand("%:p").'::'.line('.')
-endfunction
-command! StoreLink :call VimwikiStoreLink()
+" " disable header folding
+" let g:vim_markdown_folding_disabled = 1
 
-function! VimwikiLinkHandler(link)
-	try
-		let pageNum = matchstr(a:link, '::\zs\d\+')
-		let file = matchstr(a:link, '^.*:\zs.*\ze::')
-		let fileCmdOutput = system('file '.file)
-		if pageNum ==? ""
-			pageNum = 1
-		endif
-		if matchstr(fileCmdOutput, '\zsPDF\ze') ==? 'PDF'
-			let opener = '/usr/bin/zathura'
-			call system(opener.' -P '.pageNum.' '.file.' &')
-			return 1
-		elseif matchstr(fileCmdOutput, '\zstext\ze') ==? 'text'
-			execute 'edit +'.pageNum.' '.file
-			return 1
-		else
-			return 0
-		endif
-	catch
-		echom "This can happen for a variety of reasons ..."
-	endtry
-	return 0
-endfunction
+" " do not use conceal feature, the implementation is not so good
+" let g:vim_markdown_conceal = 0
+
+" " support front matter of various format
+" let g:vim_markdown_frontmatter = 1  " for YAML format
+" let g:vim_markdown_toml_frontmatter = 1  " for TOML format
+" let g:vim_markdown_json_frontmatter = 1  " for JSON format
+
+Plug 'vim-pandoc/vim-pandoc'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+let g:pandoc#folding#fdc = 0
+let g:pandoc#spell#enabled = 0
+
+" Plug 'vimwiki/vimwiki'
+" let wiki = {}
+" let wiki.path = '~/vimwiki/'
+" let wiki.auto_toc=1
+" let wiki.nested_syntaxes = {
+" 			\ 'python': 'python',
+" 			\ 'vimL': 'vim',
+" 			\ 'bash': 'bash',
+" 			\ 'java': 'java',
+" 			\ 'json': 'json',
+" 			\ 'xml': 'xml',
+" 			\ 'plantuml': 'plantuml',
+" 			\ 'perl': 'perl'}
+" let g:vimwiki_list = [wiki]
+" let g:vimwiki_html_header_numbering = 1
+" au Filetype vimwiki setlocal textwidth=80
+
+" " file:xxx::lineNum to unnamed register
+" function! VimwikiStoreLink()
+" 	let @" = 'file:'.expand("%:p").'::'.line('.')
+" endfunction
+" command! StoreLink :call VimwikiStoreLink()
+
+" function! VimwikiLinkHandler(link)
+" 	try
+" 		let pageNum = matchstr(a:link, '::\zs\d\+')
+" 		let file = matchstr(a:link, '^.*:\zs.*\ze::')
+" 		let fileCmdOutput = system('file '.file)
+" 		if pageNum ==? ""
+" 			pageNum = 1
+" 		endif
+" 		if matchstr(fileCmdOutput, '\zsPDF\ze') ==? 'PDF'
+" 			let opener = '/usr/bin/zathura'
+" 			call system(opener.' -P '.pageNum.' '.file.' &')
+" 			return 1
+" 		elseif matchstr(fileCmdOutput, '\zstext\ze') ==? 'text'
+" 			execute 'edit +'.pageNum.' '.file
+" 			return 1
+" 		else
+" 			return 0
+" 		endif
+" 	catch
+" 		echom "This can happen for a variety of reasons ..."
+" 	endtry
+" 	return 0
+" endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Plug 'tpope/vim-unimpaired'
 
@@ -271,26 +287,5 @@ augroup java
 	au FileType java nnoremap <buffer> <leader>i :call eclim#java#correct#Correct()<cr>
 	au FileType java inoremap <buffer> <c-d> <c-x><c-u>
 augroup END
-
-Plug 'brookhong/cscope.vim'
-nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
-nnoremap <leader>l :call ToggleLocationList()<CR>
-
-" s: Find this C symbol
-nnoremap  <leader>fs :call CscopeFind('s', expand('<cword>'))<CR>
-" g: Find this definition
-nnoremap  <leader>fg :call CscopeFind('g', expand('<cword>'))<CR>
-" d: Find functions called by this function
-nnoremap  <leader>fd :call CscopeFind('d', expand('<cword>'))<CR>
-" c: Find functions calling this function
-nnoremap  <leader>fc :call CscopeFind('c', expand('<cword>'))<CR>
-" t: Find this text string
-nnoremap  <leader>ft :call CscopeFind('t', expand('<cword>'))<CR>
-" e: Find this egrep pattern
-" nnoremap  <leader>fe :call CscopeFind('e', expand('<cword>'))<CR>
-" f: Find this file
-" nnoremap  <leader>ff :call CscopeFind('f', expand('<cword>'))<CR>
-" i: Find files #including this file
-nnoremap  <leader>fi :call CscopeFind('i', expand('<cword>'))<CR>
 
 call plug#end()
