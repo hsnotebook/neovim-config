@@ -55,17 +55,21 @@ snippet class "normar class" b
 package `!p snip.rv = package()`;
 
 public class `!v expand('%:t:r')` {
-
-	${1:// code}
-
+	${0}
 }
 endsnippet
 
 snippet testboot "spring boot test" b
 package `!p snip.rv = package()`;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
+import static org.assertj.core.api.Assertions.*;
+
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class `!v expand('%:t:r')` {
 
 	${1:// code}
@@ -86,11 +90,9 @@ endsnippet
 snippet controller "controller" b
 package `!p snip.rv = package()`;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("${1:url}")
+@RestController
 public class `!v expand('%:t:r')` {
 
 	${2:// code}
@@ -117,6 +119,9 @@ package `!p snip.rv = package()`;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import lombok.Data;
+
+@Data
 @Entity
 @Table(name = "${1:name}")
 public class `!v expand('%:t:r')` {
@@ -134,6 +139,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface `!p snip.rv = fn.replace(".java","")` extends JpaRepository<`!p snip.rv = fn.replace("Repository.java", "")`, ${1:T}> {
+
+}
+endsnippet
+
+snippet mapper "mybatis mapper" b
+package `!p snip.rv = package()`;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface `!v expand('%:t:r')` {
 
 }
 endsnippet
@@ -167,13 +183,46 @@ snippet rq "request param" w
 @RequestParam
 endsnippet
 
-snippet rb "response body" b
-@ResponseBody
+snippet rb "request body" i
+@RequestBody
 endsnippet
 
-snippet webmethod "web method" b
-@RequestMapping(${1:"url"})${2}
+snippet pv "path variable" i
+@PathVariable
+endsnippet
+
+snippet gm "get web method" b
+@GetMapping(${1:"url"})${2}
 public ${3:String} ${4:method}(${5:param}) {
 	${6:// code}
 }
+endsnippet
+
+snippet pm "post web method" b
+@PostMapping(${1:"url"})${2}
+public ${3:String} ${4:method}(${5:param}) {
+	${6:// code}
+}
+endsnippet
+
+#######################
+# log
+snippet lg "logger" b
+private static final Logger logger = LoggerFactory.getLogger(`!v expand('%:t:r')`.class);
+endsnippet
+
+snippet ld "logger.debug()" b
+logger.debug("${1:msg}");
+endsnippet
+
+snippet li "logger.info()" b
+logger.info("${1:msg}");
+endsnippet
+
+snippet lw "logger.warn()" b
+logger.warn("${1:msg}");
+endsnippet
+
+snippet le "logger.error()" b
+logger.error("${1:msg}");
 endsnippet

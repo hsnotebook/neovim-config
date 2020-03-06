@@ -6,38 +6,14 @@ endif
 
 call plug#begin(nvim_home . '/plugged')
 
+"" Misc {{{
 let mapleader=" "
 let maplocalleader=" "
 
 filetype plugin indent on
 
-" Windows and tabs start {{{
+set directory=/tmp
 
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-nnoremap tn :tabn<cr>
-nnoremap tp :tabp<cr>
-Plug 'gcmt/taboo.vim'
-
-" }}}
-
-" Terminal {{{
-tnoremap <C-h> <C-\><C-N><C-w>h
-tnoremap <C-j> <C-\><C-N><C-w>j
-tnoremap <C-k> <C-\><C-N><C-w>k
-tnoremap <C-l> <C-\><C-N><C-w>l
-tnoremap <Esc><Esc> <C-\><C-n>
-augroup term_statusline
-	au!
-	autocmd TermOpen * setlocal statusline=%{b:term_title}
-augroup END
-nnoremap <leader>tb :vsplit term://bash<cr>
-tnoremap <leader>tb <C-\><C-N>:vsplit term://bash<cr>
-" }}}
-
-" Misc {{{
 nnoremap <leader>w :w<cr>
 nnoremap <leader>q :q<cr>
 nnoremap <leader>wq :wq<cr>
@@ -52,121 +28,101 @@ inoremap <right> <nop>
 inoremap <up> <nop>
 inoremap <down> <nop>
 
-colorscheme wombat
-
 set showmatch
 set mat=2
 
 set showcmd
 set splitright
-set autowrite
-set autoread
+
+Plug 'vim-scripts/DrawIt'
+
+Plug 'christoomey/vim-tmux-navigator'
+"}}}
+
+"" Windows and tabs {{{
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+nnoremap tn :tabn<cr>
+nnoremap tp :tabp<cr>
+Plug 'gcmt/taboo.vim'
+"}}}
+
+"" Terminal {{{
+tnoremap <C-h> <C-\><C-N><C-w>h
+tnoremap <C-j> <C-\><C-N><C-w>j
+tnoremap <C-k> <C-\><C-N><C-w>k
+tnoremap <C-l> <C-\><C-N><C-w>l
+tnoremap <Esc><Esc> <C-\><C-n>
+augroup term_statusline
+	au!
+	autocmd TermOpen * setlocal statusline=%{b:term_title}
+augroup END
+nnoremap <leader>tb :vsplit term://bash<cr>
+tnoremap <leader>tb <C-\><C-N>:vsplit term://bash<cr>
+" }}}
+
+"" GUI {{{
+colorscheme wombat
 
 set laststatus=2
 set statusline=%F%m%r%w\ %{fugitive#statusline()}\ [POS+%04l,%04v]\ [%p%%]\ [LEN=%L]\ [%{&ff}]
 " }}}
 
-" Tab config {{{
+"" Folding {{{
+set foldenable
+augroup folding
+	au!
+	au FileType vimwiki setlocal foldlevel=1
+	au FileType vim setlocal foldmethod=marker | setlocal foldlevel=0
+	au FileType java setlocal foldmethod=syntax | setlocal foldlevel=1 | setlocal nofoldenable
+	au FileType java nnoremap <buffer> zo zO
+augroup end
+" "Refocus" folds
+nnoremap ,z zMzvzz
+nnoremap zv zvzz
+nnoremap <leadar>z za
+"}}}
+
+"" Tabstop {{{
 set tabstop=4
 set shiftwidth=4
 set noexpandtab
-augroup xml_html_indent
+augroup two_tab_indent
 	au!
-	autocmd FileType xml,html setlocal tabstop=2 | setlocal shiftwidth=2
+	autocmd FileType xml,html,json setlocal tabstop=2 | setlocal shiftwidth=2
+    autocmd FileType scss,vue,javascript,yaml,css setlocal expandtab | setlocal tabstop=2 | setlocal shiftwidth=2
 augroup END
-" }}}
+"}}}
 
-" Search {{{
-set incsearch
-set hlsearch
-set ignorecase
-set nowrapscan
-hi Search cterm=NONE ctermfg=black ctermbg=gray
+"" Editing {{{
+set autowrite
+set autoread
 
-" search hilight text in visual mode
-vnoremap <silent> * :<C-U>
-    \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-    \gvy/<C-R><C-R>=substitute(
-    \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-    \gV:call setreg('"', old_reg, old_regtype)<CR>
+nnoremap <leader>e :e!<cr>
+nnoremap gV `[v`]
 
-vnoremap <silent> # :<C-U>
-    \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-    \gvy?<C-R><C-R>=substitute(
-    \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-    \gV:call setreg('"', old_reg, old_regtype)<CR>
+inoremap <C-l> <esc>b~ea
 
-" disables search highlighting when you are done searching and re-enables it when you search again.
-Plug 'romainl/vim-cool'
-" }}}
-
-" Delete trailing whitespace {{{
-function! DeleteTrailingWS()
-	execute 'normal! mz'
-	execute '%s/\s\+$//e'
-	execute "normal! `z"
-endfunction
+Plug 'bronson/vim-trailing-whitespace'
 
 augroup clear_trail_white_space
 	au!
-	au BufWritePre * :call DeleteTrailingWS()
+	au BufWritePre * :FixWhitespace
 augroup END
-" }}}
 
-" grep setting
-set grepprg=ag\ --nogroup\ --nocolor
-" bind K to grep word under cursor
-nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
-
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#auto_complete_delay = 500
-let g:deoplete#complete_method = 'omnifunc'
-
-" quickfix
-Plug 'romainl/vim-qf'
-
-Plug 'kien/ctrlp.vim'
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/target/*,*/node_modules/*
-let g:ctrlp_clear_cache_on_exit = 0
+packadd! matchit
 
 Plug 'SirVer/ultisnips'
 let g:UltiSnipsEditSplit="vertical"
 
-Plug 'tpope/vim-fugitive'
-nnoremap <leader>gs :Gstatus<cr>
-
 Plug 'hotoo/pangu.vim'
-
 Plug 'tpope/vim-commentary'
-
 Plug 'tpope/vim-surround'
-
 Plug 'tpope/vim-repeat'
-
-" Frontend Develop {{{
-Plug 'posva/vim-vue'
-augroup web_indent
-    au!
-    autocmd FileType vue setlocal expandtab | setlocal tabstop=2 | setlocal shiftwidth=2
-    autocmd FileType javascript setlocal expandtab | setlocal tabstop=2 | setlocal shiftwidth=2
-augroup END
-
-Plug 'othree/html5.vim'
-
-Plug 'mattn/emmet-vim' , { 'for': ['xml', 'html', 'jsp', 'js', 'vue'] }
-
-Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
-let g:tern_request_timeout = 1
-let g:tern_show_signature_in_pum = 0
-
-Plug 'pangloss/vim-javascript'
-" javascript
-Plug 'prettier/vim-prettier', { 'do': 'npm install -g' }
-" }}}
-
-
-Plug 'christoomey/vim-tmux-navigator'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-obsession'
 
 Plug 'terryma/vim-multiple-cursors'
 let g:multi_cursor_quit_key='<C-c>'
@@ -181,68 +137,143 @@ map <Plug>(easymotion-prefix)h <Plug>(easymotion-linebackward)
 Plug 'vim-scripts/fcitx.vim'
 set ttimeoutlen=100
 
+Plug 'jiangmiao/auto-pairs'
+set sessionoptions+=globals
+
 Plug 'junegunn/vim-easy-align'
 xnoremap ga <Plug>(EasyAlign)
 nnoremap ga <Plug>(EasyAlign)
+"}}}
 
-Plug 'jiangmiao/auto-pairs'
+"" Search {{{
+set incsearch
+set hlsearch
+set ignorecase
+set nowrapscan
+hi Search cterm=NONE ctermfg=black ctermbg=gray
 
-Plug 'aklt/plantuml-syntax'
-let g:plantuml_executable_script="java -jar /home/hs/bin/plantuml.jar -charset UTF-8"
+" disables search highlighting when you are done searching
+" and re-enables it when you search again.
+Plug 'romainl/vim-cool'
 
-augroup plantuml_refresh
+" search hilight text in visual mode
+vnoremap <silent> * :<C-U>
+    \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
+    \gvy/<C-R><C-R>=substitute(
+    \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+    \gV:call setreg('"', old_reg, old_regtype)<CR>
+
+vnoremap <silent> # :<C-U>
+    \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
+    \gvy?<C-R><C-R>=substitute(
+    \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+    \gV:call setreg('"', old_reg, old_regtype)<CR>
+
+" grep setting
+set grepprg=ag\ --nogroup\ --nocolor
+" }}}
+
+"" Project Manager {{{
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+nnoremap <leader>fe :NERDTreeToggle<cr>
+nnoremap <leader>ff :NERDTreeFind<cr>
+
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/target/*,*/node_modules/*
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+" nnoremap <silent> <leader>p :Files<CR>
+" nnoremap <silent> <leader>b :Buffers<CR>
+nnoremap <silent> <C-p> :Files<CR>
+nnoremap K :Ag "\b<C-R><C-W>\b"<CR>
+
+Plug 'tpope/vim-fugitive'
+nnoremap <leader>gs :Gstatus<cr>
+
+Plug 'airblade/vim-rooter'
+let g:rooter_patterns = ['.root', '.gitignore', '.git/']
+let g:rooter_use_lcd = 1
+let g:rooter_silent_chdir = 1
+let g:rooter_change_directory_for_non_project_files = ''
+"}}}
+
+"" Langauage {{{
+"" Lsp {{{
+" Plug 'prabirshrestha/async.vim'
+" Plug 'prabirshrestha/vim-lsp'
+" Plug 'mattn/vim-lsp-settings'
+" let g:lsp_log_verbose = 1
+" let g:lsp_log_file = expand('~/vim-lsp.log')
+" Plug 'autozimu/LanguageClient-neovim'
+"}}}
+
+"" Front Develop {{{
+Plug 'posva/vim-vue'
+
+Plug 'othree/html5.vim'
+
+Plug 'mattn/emmet-vim' , { 'for': ['xml', 'html', 'jsp', 'js', 'vue'] }
+
+Plug 'leafgarland/typescript-vim'
+
+Plug 'pangloss/vim-javascript'
+
+let g:tern_request_timeout = 1
+let g:tern_show_signature_in_pum = 0
+"}}}
+
+"" Java {{{
+function! JavaFindOrCreateTest()
+
+	let srcFile = expand('%:h')
+	echo srcFile
+
+endfunction
+
+let g:EclimLoggingDisabled=1
+augroup java
 	au!
-	au filetype plantuml nnoremap <f5> :w<cr>:silent make<cr>
-	au filetype plantuml inoremap <f5> <esc>:w<cr>:silent make<cr>
+	au FileType java nnoremap <buffer> <leader>o :call eclim#java#import#OrganizeImports()<cr>
+	au FileType java nnoremap <buffer> <leader>i :call eclim#java#correct#Correct()<cr>
+	au FileType java nnoremap <buffer> gd :JavaSearch -x declarations<cr>
+	au FileType java nnoremap <buffer> gi :JavaSearch -x implementors<cr>
+	au FileType java inoremap <buffer> <c-d> <c-x><c-u>
 augroup END
+"}}}
+"}}}
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""" Edit something """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" " tabular plugin is used to format tables
-" Plug 'godlygeek/tabular'
-" " JSON front matter highlight plugin
-" Plug 'elzr/vim-json'
-" Plug 'plasticboy/vim-markdown'
+"" Document {{{
 
-" " disable header folding
-" let g:vim_markdown_folding_disabled = 1
-
-" " do not use conceal feature, the implementation is not so good
-" let g:vim_markdown_conceal = 0
-
-" " support front matter of various format
-" let g:vim_markdown_frontmatter = 1  " for YAML format
-" let g:vim_markdown_toml_frontmatter = 1  " for TOML format
-" let g:vim_markdown_json_frontmatter = 1  " for JSON format
-
-Plug 'vim-pandoc/vim-pandoc'
-Plug 'vim-pandoc/vim-pandoc-syntax'
-let g:pandoc#folding#fdc = 0
-let g:pandoc#spell#enabled = 0
-
-" Plug 'vimwiki/vimwiki'
-" let wiki = {}
-" let wiki.path = '~/vimwiki/'
-" let wiki.auto_toc=1
-" let wiki.nested_syntaxes = {
-" 			\ 'python': 'python',
-" 			\ 'vimL': 'vim',
-" 			\ 'bash': 'bash',
-" 			\ 'java': 'java',
-" 			\ 'json': 'json',
-" 			\ 'xml': 'xml',
-" 			\ 'plantuml': 'plantuml',
-" 			\ 'perl': 'perl'}
-" let g:vimwiki_list = [wiki]
-" let g:vimwiki_html_header_numbering = 1
+Plug 'vimwiki/vimwiki'
+let wiki = {}
+let wiki.path = '~/vimwiki/'
+let wiki.auto_toc=1
+let wiki.nested_syntaxes = {
+			\ 'python': 'python',
+			\ 'vimL': 'vim',
+			\ 'bash': 'bash',
+			\ 'java': 'java',
+			\ 'js': 'javascript',
+			\ 'json': 'json',
+			\ 'xml': 'xml',
+			\ 'sql': 'sql',
+			\ 'plantuml': 'plantuml',
+			\ 'perl': 'perl'}
+let g:vimwiki_list = [wiki]
+let g:vimwiki_html_header_numbering = 1
+let g:vimwiki_folding = 'syntax'
 " au Filetype vimwiki setlocal textwidth=80
 
-" " file:xxx::lineNum to unnamed register
-" function! VimwikiStoreLink()
-" 	let @" = 'file:'.expand("%:p").'::'.line('.')
-" endfunction
-" command! StoreLink :call VimwikiStoreLink()
+" Plug 'vimwiki/vimwiki'
+" let g:vimwiki_list = [{'path': '~/vimwiki/',
+"                       \ 'syntax': 'markdown', 'ext': '.md'}]
+nnoremap <leader>tt :VimwikiToggleListItem<cr>
+
+" file:xxx::lineNum to unnamed register
+function! VimwikiStoreLink()
+	let @" = 'file:'.expand("%:p").'::'.line('.')
+endfunction
+command! StoreLink :call VimwikiStoreLink()
 
 " function! VimwikiLinkHandler(link)
 " 	try
@@ -268,24 +299,7 @@ let g:pandoc#spell#enabled = 0
 " 	return 0
 " endfunction
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Plug 'tpope/vim-unimpaired'
-
-" The vim source for neocomplete/deoplete
-Plug 'Shougo/neco-vim'
-
-Plug 'nhooyr/neoman.vim'
-
-set sessionoptions+=globals
-Plug 'tpope/vim-obsession'
-
-" eclim
-augroup java
-	au!
-	au FileType java nnoremap <buffer> <leader>o :call eclim#java#import#OrganizeImports()<cr>
-	au FileType java nnoremap <buffer> <leader>i :call eclim#java#correct#Correct()<cr>
-	au FileType java inoremap <buffer> <c-d> <c-x><c-u>
-augroup END
+Plug 'masukomi/vim-markdown-folding'
+"}}}
 
 call plug#end()

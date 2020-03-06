@@ -23,7 +23,11 @@ if (${1:condition}) {
 endsnippet
 
 snippet cl
-console.log(${1:thing});
+console.log(${1:thing})
+endsnippet
+
+snippet ce
+console.error(${1:thing})
 endsnippet
 
 snippet require "require function" b
@@ -37,18 +41,17 @@ require(${1:dependencies}`!p snip.rv = ', ' if len(t[1]) > 1 else ''`function($2
 endsnippet
 
 snippet func "define function" w
-function`!p snip.rv = ' ' if len(t[1]) > 0 else ''`$1(${2:args}) {
-	${3:// code}
+function $1 ($2) {
+	$3
 }
 endsnippet
 
-snippet cls "Reactjs Class" b
+snippet class "React class" b
 class ${1:name} extends React.Component {
-
-	constructor(props) {
-		super(props);
-		this.state = ({$2});
+	render() {
+		return (
+			${2}
+		);
 	}
-
 }
 endsnippet
