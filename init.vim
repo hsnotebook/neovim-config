@@ -105,6 +105,17 @@ nnoremap gV `[v`]
 
 inoremap <C-l> <esc>b~ea
 
+augroup Binary
+  au!
+  au BufReadPre  *.bin let &bin=1
+  au BufReadPost *.bin if &bin | %!xxd
+  au BufReadPost *.bin set ft=xxd | endif
+  au BufWritePre *.bin if &bin | %!xxd -r
+  au BufWritePre *.bin endif
+  au BufWritePost *.bin if &bin | %!xxd
+  au BufWritePost *.bin set nomod | endif
+augroup END
+
 Plug 'bronson/vim-trailing-whitespace'
 
 augroup clear_trail_white_space
@@ -123,6 +134,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-obsession'
+Plug 'junegunn/goyo.vim'
 
 Plug 'terryma/vim-multiple-cursors'
 let g:multi_cursor_quit_key='<C-c>'
@@ -182,19 +194,14 @@ set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/target/*,*/node_modules/*
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
-" nnoremap <silent> <leader>p :Files<CR>
-" nnoremap <silent> <leader>b :Buffers<CR>
-nnoremap <silent> <C-p> :Files<CR>
-nnoremap K :Ag "\b<C-R><C-W>\b"<CR>
+nnoremap <silent> <leader>p :Files<CR>
+nnoremap <silent> <leader>P :GFiles<CR>
+nnoremap <silent> <leader>b :Buffers<CR>
+" nnoremap <silent> <C-p> :Files<CR>
+nnoremap K :Ag <C-R><C-W><CR>
 
 Plug 'tpope/vim-fugitive'
 nnoremap <leader>gs :Gstatus<cr>
-
-Plug 'airblade/vim-rooter'
-let g:rooter_patterns = ['.root', '.gitignore', '.git/']
-let g:rooter_use_lcd = 1
-let g:rooter_silent_chdir = 1
-let g:rooter_change_directory_for_non_project_files = ''
 "}}}
 
 "" Langauage {{{
@@ -223,13 +230,6 @@ let g:tern_show_signature_in_pum = 0
 "}}}
 
 "" Java {{{
-function! JavaFindOrCreateTest()
-
-	let srcFile = expand('%:h')
-	echo srcFile
-
-endfunction
-
 let g:EclimLoggingDisabled=1
 augroup java
 	au!
@@ -257,6 +257,7 @@ let wiki.nested_syntaxes = {
 			\ 'json': 'json',
 			\ 'xml': 'xml',
 			\ 'sql': 'sql',
+			\ 'html': 'html',
 			\ 'plantuml': 'plantuml',
 			\ 'perl': 'perl'}
 let g:vimwiki_list = [wiki]
