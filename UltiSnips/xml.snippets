@@ -53,6 +53,9 @@ snippet mapper
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="`!p snip.rv = package()`.`!v expand('%:t:r')`">
 
+	<resultMap id="`!p snip.rv = resultMapId(snip.basename)`" type="`!p snip.rv = entityType(snip.basename)`">
+	</resultMap>
+
 </mapper>
 endsnippet
 

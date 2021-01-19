@@ -19,7 +19,10 @@ def package():
 	return package
 
 def getClassToBeTested():
-	return snip.basename.replace('Test', '')
+	return snip.basename.replace('Tests', '')
+
+def lowerFirstLetterCase(s):
+	return s[:1].lower() + s[1:]
 endglobal
 
 ##################################
@@ -86,7 +89,7 @@ public class `!v expand('%:t:r')` {
 	}
 
 	@Autowired
-	private StudentService studentService;
+	private `!p snip.rv = getClassToBeTested()` `!p snip.rv = lowerFirstLetterCase(getClassToBeTested())`;
 
 	${1:// code}
 

@@ -1,0 +1,4 @@
+{
+  "java.jdt.ls.vmargs": "-javaagent:/usr/local/share/lombok/lombok.jar",
+	"suggest.autoTrigger": "none"
+}
